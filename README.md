@@ -9,8 +9,8 @@ Aligned with Taxila **QuickBite** tutorial + **M2 ELS Reliable Data Pipelines** 
 
 See **[reports/PROGRESS.md](reports/PROGRESS.md)** for:
 
-- What is completed till now
-- What is **pending for Week 1 / M2** (dataset DVC versioning + team/spreadsheet items)
+- What is completed till now (M2 data + DVC done; M3–M5 code ahead of schedule)
+- Remaining Week-1 process items (team names, spreadsheet, short design note)
 - Later-week and submission leftovers (report + video)
 
 ## Architecture (Taxila-style)
@@ -62,7 +62,9 @@ mp1-delivery-eta/
 │   ├── run_m2_pipeline.py           # Option A: Week 1 / M2
 │   ├── run_train.py                 # Option A: M2 + M3
 │   └── snapshot_datasets.py         # DVC: all data-source snapshots
+├── dvc.yaml / dvc.lock
 ├── docs/DVC.md
+├── USAGE.md
 ├── reports/
 └── docker/Dockerfile
 ```
