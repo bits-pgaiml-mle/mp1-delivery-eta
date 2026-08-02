@@ -66,7 +66,27 @@ pip install -r requirements.txt
 
 ## Run (matches course weekly flow)
 
+### Option A — easiest (recommended)
+
+```bash
+python scripts/run_m2_pipeline.py
+python scripts/run_train.py
+uvicorn serving.api:app --reload --port 8000
+python monitoring/simulate_drift_traffic.py
+python monitoring/check_drift.py
+```
+
+### Option B — step by step
+
 ### M2 — data pipeline
+
+```bash
+python data/generate_data.py
+python validation/validate_data.py
+python features/build_features.py
+```
+
+Or:
 
 ```bash
 python scripts/run_m2_pipeline.py
