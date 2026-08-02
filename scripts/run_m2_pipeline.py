@@ -17,6 +17,8 @@ def main() -> None:
     run(["validation/validate_data.py"])
     run(["features/build_features.py"])
     print("\nM2 pipeline complete (prepare -> validate -> feature store).")
+    print("Option A next: python scripts/run_train.py")
+    print("Option B next: python training/train.py  (see USAGE.md)")
 
 
 if __name__ == "__main__":
