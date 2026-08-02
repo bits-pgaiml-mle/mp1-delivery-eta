@@ -56,17 +56,11 @@ mp1-delivery-eta/
 └── docker/Dockerfile
 ```
 
-## Setup
+## Usage (local + Colab)
 
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-```
+Full instructions (Option A / Option B, local and Google Colab): **[USAGE.md](USAGE.md)**
 
-## Run (matches course weekly flow)
-
-### Option A — easiest (recommended)
+### Local — Option A (quick)
 
 ```bash
 python scripts/run_m2_pipeline.py
@@ -76,47 +70,29 @@ python monitoring/simulate_drift_traffic.py
 python monitoring/check_drift.py
 ```
 
-### Option B — step by step
-
-### M2 — data pipeline
+### Local — Option B (step by step)
 
 ```bash
 python data/generate_data.py
 python validation/validate_data.py
 python features/build_features.py
-```
-
-Or:
-
-```bash
-python scripts/run_m2_pipeline.py
-```
-
-### M3 — experiment tracking
-
-```bash
 python training/train.py
-mlflow ui
-```
-
-### M4 — serve
-
-```bash
 uvicorn serving.api:app --reload --port 8000
 ```
 
 Swagger: http://127.0.0.1:8000/docs
 
-```bash
-python -c "import requests; print(requests.post('http://127.0.0.1:8000/predict', json={'distance_km':12.5,'pickup_hour':20,'is_weekend':1,'passenger_count':3,'weather':'Rainy','traffic_level':'High','pickup_zone':'Z01','dropoff_zone':'Z09'}).json())"
+### Colab (CPU)
+
+```python
+!git clone https://github.com/bits-pgaiml-mle/mp1-delivery-eta.git
+%cd mp1-delivery-eta
+!pip install -q -r requirements.txt
+!python scripts/run_m2_pipeline.py
+!python scripts/run_train.py
 ```
 
-### M5 — drift
-
-```bash
-python monitoring/simulate_drift_traffic.py
-python monitoring/check_drift.py
-```
+Use `fastapi.testclient.TestClient` for `/predict` on Colab (details in USAGE.md). T4 GPU is not required for Flavor A.
 
 ## Dataset versioning (DVC)
 
