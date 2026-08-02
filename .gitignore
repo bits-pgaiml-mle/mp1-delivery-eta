@@ -219,14 +219,16 @@ __marimo__/
 
 # Project artifacts
 data/raw/*.csv
-data/processed/*.csv
-!data/**/.gitkeep
-models/*.joblib
-models/*.pkl
-models/*.json
-!models/.gitkeep
-monitoring/logs/*.csv
-!monitoring/logs/.gitkeep
+data/feature_schema.json
+data/processed/
+feature_store/*.db
+!feature_store/.gitkeep
+model_store/*.joblib
+model_store/*.pkl
+model_store/*.json
+!model_store/.gitkeep
+monitoring/*.db
+monitoring/logs/
 mlruns/
 mlartifacts/
 .dvc/cache/

@@ -3,112 +3,120 @@
 **BITS Pilani WILP · PGAIML · PCAM ZC412 Machine Learning Engineering**  
 **Mini-Project-1 · Flavor A — Delivery / Ride ETA Prediction**
 
-End-to-end ML pipeline: raw trip data → validation & features → tracked experiments → REST API → monitoring / drift / retraining design.
+Aligned with Taxila **QuickBite** tutorial + **M2 ELS Reliable Data Pipelines** patterns, adapted for ETA regression (Flavor A brief).
 
-## Architecture
+## Architecture (Taxila-style)
 
 ```text
-raw trips.csv
-      |
-      v
-  validate  ----->  features  ----->  trips_features.csv (DVC)
-                         |
-                         v
-                   train + MLflow  ----->  models/best_model.joblib
-                         |
-                         v
-                      FastAPI  ----->  POST /predict (eta_minutes)
-                         |
-                         v
-                    monitoring  ----->  logs + drift report + retrain trigger
+data/raw/trips.csv  (immutable raw)
+        |
+        v
+validation/validate_data.py   (Pandera schema + statistical checks)
+        |
+        v
+features/build_features.py    (shared encoding -> SQLite feature store)
+        |                         + data/feature_schema.json contract
+        v
+training/train.py             (MLflow: LinearRegression vs HistGradientBoosting)
+        |
+        v
+serving/api.py                (FastAPI + Pydantic + shared transform)
+        |
+        v
+monitoring/logger.py          (prediction SQLite log)
+monitoring/check_drift.py     (train vs prod shift in σ)
 ```
 
-## Repository layout
+## Layout
 
 ```text
 mp1-delivery-eta/
-├── configs/config.yaml          # paths, target, thresholds
-├── data/
-│   ├── raw/                     # generated or downloaded trips
-│   └── processed/               # feature tables
-├── src/
-│   ├── data/                    # generate + validate (Week 1 / M2)
-│   ├── features/                # feature engineering (Week 1 / M2)
-│   ├── training/                # MLflow experiments (Week 2 / M3)
-│   ├── serving/                 # FastAPI app (Week 3 / M4)
-│   └── monitoring/              # drift + retraining (Week 4 / M5)
-├── models/                      # serialized model artifacts
-├── monitoring/logs/             # prediction logs
-├── reports/                     # model comparison + drift write-ups
-├── notebooks/                   # optional exploration
-├── docker/Dockerfile
-├── scripts/run_week1.py
-└── requirements.txt
+├── data/generate_data.py
+├── data/raw/
+├── validation/validate_data.py
+├── features/build_features.py
+├── feature_store/feature_store.db
+├── training/train.py
+├── serving/api.py
+├── monitoring/logger.py
+├── monitoring/check_drift.py
+├── monitoring/simulate_drift_traffic.py
+├── model_store/
+├── scripts/run_m2_pipeline.py
+├── scripts/run_train.py
+├── reports/
+└── docker/Dockerfile
 ```
 
 ## Setup
 
 ```bash
-cd mp1-delivery-eta
 python -m venv .venv
-
-# Windows
 .venv\Scripts\activate
-
-# macOS / Linux
-# source .venv/bin/activate
-
 pip install -r requirements.txt
 ```
 
-## Week 1 — data pipeline (ready)
+## Run (matches course weekly flow)
+
+### M2 — data pipeline
 
 ```bash
-python scripts/run_week1.py
+python scripts/run_m2_pipeline.py
 ```
 
-Or step by step:
+### M3 — experiment tracking
 
 ```bash
-python -m src.data.generate
-python -m src.data.validate
-python -m src.features.build_features
+python training/train.py
+mlflow ui
 ```
 
-## Later weeks (stubs in place)
+### M4 — serve
 
-| Week | Module | Command / artifact |
-|------|--------|--------------------|
-| 2 | M3 | `python -m src.training.train` → MLflow runs + `reports/model_comparison.md` |
-| 3 | M4 | `uvicorn src.serving.app:app --reload` → `/health`, `/predict` |
-| 4 | M5 | `python -m src.monitoring.drift` → `reports/drift_report.md` |
+```bash
+uvicorn serving.api:app --reload --port 8000
+```
 
-## Dataset
+Swagger: http://127.0.0.1:8000/docs
 
-Starter uses a **synthetic trip dataset** (distance, hour, weekend, weather, traffic, zones → `eta_minutes`) so the pipeline runs without external downloads.  
-Optional upgrade: replace `data/raw/trips.csv` with [NYC Taxi Trip Duration](https://www.kaggle.com/c/nyc-taxi-trip-duration) and adapt schema validation.
+```bash
+python -c "import requests; print(requests.post('http://127.0.0.1:8000/predict', json={'distance_km':12.5,'pickup_hour':20,'is_weekend':1,'passenger_count':3,'weather':'Rainy','traffic_level':'High','pickup_zone':'Z01','dropoff_zone':'Z09'}).json())"
+```
 
-## Tools
+### M5 — drift
 
-| Concern | Tool |
-|---------|------|
-| Tracking | MLflow |
-| Data versioning | DVC |
-| Serving | FastAPI + Uvicorn |
-| Packaging | Docker |
-| VCS | Git (weekly commits) |
+```bash
+python monitoring/simulate_drift_traffic.py
+python monitoring/check_drift.py
+```
+
+## Dataset versioning (DVC)
+
+```bash
+dvc init
+dvc add data/raw/trips.csv
+git add data/raw/trips.csv.dvc .gitignore
+git commit -m "Version raw trips dataset with DVC"
+```
+
+## Governance checklist
+
+- [x] Raw schema validated before training (Pandera)
+- [x] Feature logic centralized (features/build_features.py shared with serving)
+- [x] Experiments logged in MLflow
+- [x] Winning run reproducible (random_state=42)
+- [x] Inference API has Pydantic validation
+- [x] Model artifact frozen in model_store/
+- [x] Predictions logged with inputs/outputs/version
+- [x] Drift detection script produces actionable output
+- [ ] Automated retraining pipeline — manual trigger design documented
+- [ ] Unit tests — deferred
+
+## Model selection
+
+See `model_store/selection.json` after training and fill `reports/model_comparison.md`.
 
 ## Team
 
-- Org: [bits-pgaiml-mle](https://github.com/bits-pgaiml-mle)
-- Repo: [mp1-delivery-eta](https://github.com/bits-pgaiml-mle/mp1-delivery-eta)
-
-Add member names and roles here before submission.
-
-## Submission checklist (from brief)
-
-1. Versioned dataset + pipeline code (Git history by week)
-2. Experiment tracking logs + model comparison report
-3. Deployed API + sample curl/Postman calls
-4. Monitoring log, drift simulation, retraining trigger design
-5. README (this file) + architecture + 5–7 min demo
+- Org: https://github.com/bits-pgaiml-mle
+- Repo: https://github.com/bits-pgaiml-mle/mp1-delivery-eta
