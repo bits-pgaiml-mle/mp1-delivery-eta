@@ -5,6 +5,14 @@
 
 Aligned with Taxila **QuickBite** tutorial + **M2 ELS Reliable Data Pipelines** patterns, adapted for ETA regression (Flavor A brief).
 
+## Progress
+
+See **[reports/PROGRESS.md](reports/PROGRESS.md)** for:
+
+- What is completed till now
+- What is **pending for Week 1 / M2** (dataset DVC versioning + team/spreadsheet items)
+- Later-week and submission leftovers (report + video)
+
 ## Architecture (Taxila-style)
 
 ```text
