@@ -92,7 +92,7 @@ python monitoring/check_drift.py
 | Validate | `validation/validate_data.py` |
 | Features | `features/build_features.py` |
 | Train | `training/train.py` |
-| Serve | `serving.api:app` via uvicorn |
+| Serve | `serving/api.py` via uvicorn |
 | Drift simulate | `monitoring/simulate_drift_traffic.py` |
 | Drift check | `monitoring/check_drift.py` |
 

@@ -22,6 +22,7 @@ dvc pull   # if a remote is configured; otherwise regenerate below
 
 ```bash
 dvc repro
+# or: python scripts/snapshot_datasets.py
 git add dvc.yaml dvc.lock .dvc .gitignore data/.gitignore
 git commit -m "Update DVC dataset snapshots"
 git tag -f week1-data-v1

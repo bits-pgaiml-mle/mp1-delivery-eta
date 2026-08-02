@@ -25,15 +25,24 @@
 
 | Item | Status | Artifact |
 |------|--------|----------|
-| Synthetic trip data generation | Done | `data/generate_data.py` → `data/raw/trips.csv` |
-| Immutable raw folder | Done | `data/raw/` |
+| Multi-source prepare (`synthetic` / `kaggle` / `both`) | Done | `data/prepare_dataset.py`, `configs/data_source.yaml` |
+| Synthetic trip data generation | Done | `data/generate_data.py` (used by prepare) |
+| Kaggle NYC-taxi adapter | Done | `data/ingest_kaggle.py` |
+| Immutable raw folder | Done | `data/raw/trips.csv` |
 | Schema validation (Pandera) | Done | `validation/validate_data.py` |
 | Statistical validation checks | Done | same script |
 | Feature engineering (shared) | Done | `features/build_features.py` |
 | Offline feature store (SQLite) | Done | `feature_store/feature_store.db` |
 | Feature schema contract | Done | `data/feature_schema.json` |
-| One-command M2 pipeline | Done | `scripts/run_m2_pipeline.py` |
+| Option A / Option B runners | Done | `scripts/run_m2_pipeline.py`, `scripts/run_train.py`; see `USAGE.md` |
 | Dataset versioning (DVC) + tag | **Done** | `dvc.yaml` snapshots all sources; tag `week1-data-v1` |
+
+### Week-1 DVC note
+
+- Snapshots: `data/versions/{synthetic,kaggle,both}/trips.csv`
+- Active raw: `data/raw/trips.csv` (default source `synthetic`, 2000 rows)
+- Reproduce: `dvc repro` (or `python scripts/snapshot_datasets.py`)
+- Docs: `docs/DVC.md`
 
 ### Ahead of Week 1 (already implemented for later weeks)
 
@@ -83,10 +92,21 @@ Optional polish (nice-to-have for Week 1, not blockers):
 ```bash
 cd mp1-delivery-eta
 python -m venv .venv
-.venv\Scripts\activate
+.venv\Scripts\activate   # Linux/macOS: source .venv/bin/activate
 pip install -r requirements.txt
-python scripts/run_m2_pipeline.py   # Week 1 / M2
-python scripts/run_train.py         # M3 (optional for Week 1)
+
+# Option A (recommended)
+python scripts/run_m2_pipeline.py
+python scripts/run_train.py
+
+# Option B (step by step) — see USAGE.md
+# python data/prepare_dataset.py --source synthetic
+# python validation/validate_data.py
+# python features/build_features.py
+# python training/train.py
+
+# Optional: refresh all DVC dataset snapshots
+# dvc repro
 ```
 
 ---
@@ -101,4 +121,5 @@ python scripts/run_train.py         # M3 (optional for Week 1)
 | Feature store | SQLite offline store | Taxila QuickBite / M2 pattern |
 | Serving | FastAPI + Pydantic | Taxila + brief |
 | Tracking | MLflow | Taxila + brief |
+| Data sources | synthetic / kaggle / both | Config-selectable; DVC versions all three |
 | Best model (current) | HistGradientBoosting | Lower MAE than linear (~2.78 vs ~4.14) |
