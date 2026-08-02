@@ -2,20 +2,15 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import yaml
 
-ROOT = Path(__file__).resolve().parents[2]
-CONFIG_PATH = ROOT / "configs" / "config.yaml"
-
-
-def load_config() -> dict:
-    with open(CONFIG_PATH, encoding="utf-8") as f:
-        return yaml.safe_load(f)
+ROOT = Path(__file__).resolve().parents[1]
+RAW_PATH = ROOT / "data" / "raw" / "trips.csv"
+N = 2000
+SEED = 42
 
 
-def generate_trips(n: int, seed: int) -> pd.DataFrame:
+def generate_trips(n: int = N, seed: int = SEED) -> pd.DataFrame:
     rng = np.random.default_rng(seed)
-
     distance_km = np.round(rng.uniform(0.5, 25.0, n), 2)
     pickup_hour = rng.integers(0, 24, n)
     is_weekend = rng.integers(0, 2, n)
@@ -60,16 +55,11 @@ def generate_trips(n: int, seed: int) -> pd.DataFrame:
 
 
 def main() -> None:
-    cfg = load_config()
-    n = int(cfg["data"]["sample_size"])
-    seed = int(cfg["data"]["random_seed"])
-    out_path = ROOT / cfg["data"]["raw_path"]
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-
-    df = generate_trips(n, seed)
-    df.to_csv(out_path, index=False)
-    print(f"Wrote {len(df)} trips -> {out_path}")
-    print(f"ETA minutes: mean={df['eta_minutes'].mean():.1f}, std={df['eta_minutes'].std():.1f}")
+    RAW_PATH.parent.mkdir(parents=True, exist_ok=True)
+    df = generate_trips()
+    df.to_csv(RAW_PATH, index=False)
+    print(f"Wrote {len(df)} trips -> {RAW_PATH}")
+    print(f"ETA mean={df['eta_minutes'].mean():.1f} std={df['eta_minutes'].std():.1f}")
 
 
 if __name__ == "__main__":

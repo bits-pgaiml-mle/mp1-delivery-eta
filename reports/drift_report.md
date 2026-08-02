@@ -1,20 +1,16 @@
-# Drift Simulation & Retraining Design
+# Drift Simulation Report
 
-**Project:** mp1-delivery-eta (Flavor A)  
-**Module:** M5 — Monitoring, Drift & Retraining  
-**Status:** Placeholder — fill after Week 4
+Training rows: 2000
+Production predictions: 23
 
-## Monitoring signals
+| Feature | Train mean | Prod mean | Shift (σ) | Status |
+|---------|------------|-----------|-----------|--------|
+| distance_km | 12.82 | 11.80 | 0.14 | OK |
+| pickup_hour | 11.37 | 16.26 | 0.71 | OK |
+| passenger_count | 2.50 | 2.30 | 0.18 | OK |
 
-- Prediction log path: `monitoring/logs/predictions.csv`
-- Metrics: MAE, RMSE, prediction vs actual residual mean
+Rainy share train≈20.55% prod=65.22%
 
-## Drift scenarios to simulate
-
-1. Rush-hour surge (shift pickup_hour distribution toward 17–20)
-2. Weather shock (increase Rainy share)
-3. Traffic regime change (increase High traffic share)
-
-## Retraining trigger (draft)
-
-Retrain when rolling 7-day MAE exceeds `configs/config.yaml -> monitoring.mae_retrain_threshold` **and** at least N=200 labeled actual ETAs are available.
+## Retraining trigger (design)
+- Retrain when any numeric feature shift > 0.8σ **and** ≥200 production labels are available.
+- Also retrain when rolling MAE vs actual ETA exceeds threshold in config/selection review.
