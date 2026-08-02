@@ -111,11 +111,12 @@ Use `fastapi.testclient.TestClient` for `/predict` on Colab (details in USAGE.md
 
 ## Dataset versioning (DVC)
 
+All dataset modes (`synthetic`, `kaggle`, `both`) are snapshotted under `data/versions/` and tracked with DVC. Details: **[docs/DVC.md](docs/DVC.md)**.
+
 ```bash
-dvc init
-dvc add data/raw/trips.csv
-git add data/raw/trips.csv.dvc .gitignore
-git commit -m "Version raw trips dataset with DVC"
+dvc repro          # regenerate all source snapshots + active data/raw
+dvc push           # push to local remote ./dvc-storage (optional)
+git tag week1-data-v1
 ```
 
 ## Governance checklist

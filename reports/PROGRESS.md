@@ -33,7 +33,7 @@
 | Offline feature store (SQLite) | Done | `feature_store/feature_store.db` |
 | Feature schema contract | Done | `data/feature_schema.json` |
 | One-command M2 pipeline | Done | `scripts/run_m2_pipeline.py` |
-| Dataset versioning (DVC) + tag | **Pending** | Documented in README; not initialized yet |
+| Dataset versioning (DVC) + tag | **Done** | `dvc.yaml` snapshots all sources; tag `week1-data-v1` |
 
 ### Ahead of Week 1 (already implemented for later weeks)
 
@@ -54,16 +54,7 @@
 
 Complete these to mark **End of Week 1** as per brief/transcripts (“ingestion, validation, feature pipeline complete; dataset version tagged”):
 
-1. **Initialize DVC and version the raw dataset**
-   ```bash
-   dvc init
-   python data/generate_data.py
-   dvc add data/raw/trips.csv
-   git add data/raw/trips.csv.dvc .gitignore .dvc/config
-   git commit -m "Version raw trips dataset with DVC"
-   git tag week1-data-v1
-   git push origin main --tags
-   ```
+1. ~~**Initialize DVC and version the raw dataset**~~ **Done** (`dvc repro`, see `docs/DVC.md`)
 2. **Add team member names/roles** in README (group submission)
 3. **Confirm Flavor A** on the course group spreadsheet
 4. **Short Week-1 note in this file** after DVC (dataset size, validation PASS evidence, feature list)

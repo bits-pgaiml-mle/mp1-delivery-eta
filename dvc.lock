@@ -1,0 +1,35 @@
+schema: '2.0'
+stages:
+  snapshot_datasets:
+    cmd: python scripts/snapshot_datasets.py
+    deps:
+    - path: configs/data_source.yaml
+      hash: md5
+      md5: b13b1c77c8adf92d0a6d8ea8719f3183
+      size: 248
+    - path: data/generate_data.py
+      hash: md5
+      md5: 29baa5c7ac7c81d0f53a35e06ecac1ea
+      size: 2311
+    - path: data/ingest_kaggle.py
+      hash: md5
+      md5: 16619049cc597cff5056c005ab42f649
+      size: 5107
+    - path: data/prepare_dataset.py
+      hash: md5
+      md5: d710bab7fa5fb3bd003e5e29c7e70279
+      size: 3035
+    - path: scripts/snapshot_datasets.py
+      hash: md5
+      md5: 3ba5303b71e230f166068e97d1011183
+      size: 1364
+    outs:
+    - path: data/raw/trips.csv
+      hash: md5
+      md5: 9553aea414dcbf579c063cd951523311
+      size: 111750
+    - path: data/versions
+      hash: md5
+      md5: 7a0498ad3afc91529fcb7b28ceb43b0d.dir
+      size: 188386
+      nfiles: 3
