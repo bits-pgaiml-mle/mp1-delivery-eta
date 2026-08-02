@@ -17,6 +17,10 @@ def main() -> None:
     run(["training/train.py"])
     print("\nM2+M3 complete. Start API with:")
     print("  uvicorn serving.api:app --reload --port 8000")
+    print("Then drift check:")
+    print("  python monitoring/simulate_drift_traffic.py")
+    print("  python monitoring/check_drift.py")
+    print("\nOption A = this script. Option B = run each stage file manually (see USAGE.md).")
 
 
 if __name__ == "__main__":

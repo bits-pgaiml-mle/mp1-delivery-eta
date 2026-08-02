@@ -43,21 +43,26 @@ monitoring/check_drift.py     (train vs prod shift in σ)
 ```text
 mp1-delivery-eta/
 ├── configs/data_source.yaml
-├── data/prepare_dataset.py
-├── data/generate_data.py
-├── data/ingest_kaggle.py
-├── data/raw/
+├── data/
+│   ├── prepare_dataset.py
+│   ├── generate_data.py
+│   ├── ingest_kaggle.py
+│   └── raw/
 ├── validation/validate_data.py
 ├── features/build_features.py
 ├── feature_store/feature_store.db
 ├── training/train.py
 ├── serving/api.py
-├── monitoring/logger.py
-├── monitoring/check_drift.py
-├── monitoring/simulate_drift_traffic.py
+├── monitoring/
+│   ├── logger.py
+│   ├── check_drift.py
+│   └── simulate_drift_traffic.py
 ├── model_store/
-├── scripts/run_m2_pipeline.py
-├── scripts/run_train.py
+├── scripts/
+│   ├── run_m2_pipeline.py           # Option A: Week 1 / M2
+│   ├── run_train.py                 # Option A: M2 + M3
+│   └── snapshot_datasets.py         # DVC: all data-source snapshots
+├── docs/DVC.md
 ├── reports/
 └── docker/Dockerfile
 ```
@@ -66,7 +71,14 @@ mp1-delivery-eta/
 
 Full instructions (Option A / Option B, local and Google Colab): **[USAGE.md](USAGE.md)**
 
-### Local — Option A (quick)
+There are **two execution paths** (same as Flavors B and C):
+
+| Path | When to use | Entry |
+|------|-------------|--------|
+| **Option A** | Fastest end-to-end run | `scripts/run_m2_pipeline.py` then `scripts/run_train.py` |
+| **Option B** | Step-by-step / debugging | prepare → validate → features → train → serve |
+
+### Local — Option A (quick, recommended)
 
 ```bash
 python scripts/run_m2_pipeline.py
@@ -74,15 +86,6 @@ python scripts/run_train.py
 uvicorn serving.api:app --reload --port 8000
 python monitoring/simulate_drift_traffic.py
 python monitoring/check_drift.py
-```
-
-### Data source switch
-
-```bash
-# configs/data_source.yaml  OR:
-python data/prepare_dataset.py --source synthetic   # default
-python data/prepare_dataset.py --source kaggle
-python data/prepare_dataset.py --source both
 ```
 
 ### Local — Option B (step by step)
@@ -93,11 +96,24 @@ python validation/validate_data.py
 python features/build_features.py
 python training/train.py
 uvicorn serving.api:app --reload --port 8000
+python monitoring/simulate_drift_traffic.py
+python monitoring/check_drift.py
 ```
 
 Swagger: http://127.0.0.1:8000/docs
 
-### Colab (CPU)
+### Data source switch (before Option A or B)
+
+```bash
+# configs/data_source.yaml  OR:
+python data/prepare_dataset.py --source synthetic   # default
+python data/prepare_dataset.py --source kaggle
+python data/prepare_dataset.py --source both
+```
+
+`scripts/run_m2_pipeline.py` (Option A) already calls `prepare_dataset.py` using the config default.
+
+### Colab — Option A (easiest)
 
 ```python
 !git clone https://github.com/bits-pgaiml-mle/mp1-delivery-eta.git
@@ -105,6 +121,15 @@ Swagger: http://127.0.0.1:8000/docs
 !pip install -q -r requirements.txt
 !python scripts/run_m2_pipeline.py
 !python scripts/run_train.py
+```
+
+### Colab — Option B (step by step)
+
+```python
+!python data/prepare_dataset.py --source synthetic
+!python validation/validate_data.py
+!python features/build_features.py
+!python training/train.py
 ```
 
 Use `fastapi.testclient.TestClient` for `/predict` on Colab (details in USAGE.md). T4 GPU is not required for Flavor A.

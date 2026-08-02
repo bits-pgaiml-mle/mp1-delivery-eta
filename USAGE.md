@@ -27,6 +27,13 @@ pip install -r requirements.txt
 
 Run all commands from the **repo root**.
 
+### Execution options (same idea as Flavors B / C)
+
+| Path | Best for | Commands |
+|------|----------|----------|
+| **Option A** | Quick full run | `python scripts/run_m2_pipeline.py` then `python scripts/run_train.py` |
+| **Option B** | Learn / debug each stage | prepare → validate → features → train → serve → drift |
+
 ### 1.1b Data source: synthetic / Kaggle / both
 
 Set `configs/data_source.yaml` → `data_source: synthetic | kaggle | both`, or pass `--source` once:
@@ -41,7 +48,7 @@ python data/prepare_dataset.py --source both
 - **kaggle** — adapts NYC taxi CSV under `data/external/kaggle/` (demo sample auto-created if missing)
 - **both** — concatenates synthetic + Kaggle-adapted rows
 
-Details: `data/external/kaggle/README.md`. Then run validate → features as usual (or `scripts/run_m2_pipeline.py`, which calls `prepare_dataset.py`).
+Details: `data/external/kaggle/README.md`. Option A’s `scripts/run_m2_pipeline.py` calls `prepare_dataset.py` automatically.
 
 ### 1.2 Option A — easiest (recommended)
 
@@ -85,7 +92,7 @@ python monitoring/check_drift.py
 | Validate | `validation/validate_data.py` |
 | Features | `features/build_features.py` |
 | Train | `training/train.py` |
-| Serve | `serving/api.py` via uvicorn |
+| Serve | `serving.api:app` via uvicorn |
 | Drift simulate | `monitoring/simulate_drift_traffic.py` |
 | Drift check | `monitoring/check_drift.py` |
 
@@ -154,7 +161,7 @@ for i in range(14):
 ### 2.3 Option B — step by step on Colab
 
 ```python
-!python data/generate_data.py
+!python data/prepare_dataset.py --source synthetic
 !python validation/validate_data.py
 !python features/build_features.py
 !python training/train.py
@@ -172,7 +179,7 @@ Possible with background process + ngrok, but **not required** for coursework. P
 
 | Stage | Option A | Option B |
 |-------|----------|----------|
-| M2 data | `scripts/run_m2_pipeline.py` | generate → validate → features |
+| M2 data | `scripts/run_m2_pipeline.py` | prepare → validate → features |
 | M3 train | `scripts/run_train.py` (includes M2) | `training/train.py` |
 | M4 serve | uvicorn / TestClient | same |
 | M5 drift | simulate + check_drift | same |
