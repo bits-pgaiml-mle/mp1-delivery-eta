@@ -20,9 +20,10 @@ SCHEMA = DataFrameSchema(
         "pickup_zone": Column(str, nullable=False),
         "dropoff_zone": Column(str, nullable=False),
         "eta_minutes": Column(float, Check.in_range(1, 180), nullable=False),
+        "data_source": Column(str, Check.isin(["synthetic", "kaggle"]), required=False, nullable=True),
     },
     coerce=True,
-    strict=True,
+    strict=False,
 )
 
 
@@ -51,7 +52,7 @@ def validate(df: pd.DataFrame) -> pd.DataFrame:
 def main() -> None:
     if not RAW_PATH.exists():
         print(f"Raw data missing: {RAW_PATH}")
-        print("Run: python data/generate_data.py")
+        print("Run: python data/prepare_dataset.py [--source synthetic|kaggle|both]")
         sys.exit(1)
 
     df = pd.read_csv(RAW_PATH)

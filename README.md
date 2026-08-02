@@ -16,6 +16,9 @@ See **[reports/PROGRESS.md](reports/PROGRESS.md)** for:
 ## Architecture (Taxila-style)
 
 ```text
+data/prepare_dataset.py  (--source synthetic | kaggle | both)
+        |
+        v
 data/raw/trips.csv  (immutable raw)
         |
         v
@@ -39,7 +42,10 @@ monitoring/check_drift.py     (train vs prod shift in σ)
 
 ```text
 mp1-delivery-eta/
+├── configs/data_source.yaml
+├── data/prepare_dataset.py
 ├── data/generate_data.py
+├── data/ingest_kaggle.py
 ├── data/raw/
 ├── validation/validate_data.py
 ├── features/build_features.py
@@ -70,10 +76,19 @@ python monitoring/simulate_drift_traffic.py
 python monitoring/check_drift.py
 ```
 
+### Data source switch
+
+```bash
+# configs/data_source.yaml  OR:
+python data/prepare_dataset.py --source synthetic   # default
+python data/prepare_dataset.py --source kaggle
+python data/prepare_dataset.py --source both
+```
+
 ### Local — Option B (step by step)
 
 ```bash
-python data/generate_data.py
+python data/prepare_dataset.py --source synthetic
 python validation/validate_data.py
 python features/build_features.py
 python training/train.py

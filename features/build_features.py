@@ -10,7 +10,7 @@ FEATURE_DB = ROOT / "feature_store" / "feature_store.db"
 SCHEMA_PATH = ROOT / "data" / "feature_schema.json"
 TABLE = "trip_features"
 TARGET = "eta_minutes"
-DROP_COLS = ["trip_id"]
+DROP_COLS = ["trip_id", "data_source"]
 CATEGORICAL = ["weather", "traffic_level"]
 
 

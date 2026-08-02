@@ -27,6 +27,22 @@ pip install -r requirements.txt
 
 Run all commands from the **repo root**.
 
+### 1.1b Data source: synthetic / Kaggle / both
+
+Set `configs/data_source.yaml` → `data_source: synthetic | kaggle | both`, or pass `--source` once:
+
+```powershell
+python data/prepare_dataset.py --source synthetic
+python data/prepare_dataset.py --source kaggle
+python data/prepare_dataset.py --source both
+```
+
+- **synthetic** — generated trips (default; fine for the brief)
+- **kaggle** — adapts NYC taxi CSV under `data/external/kaggle/` (demo sample auto-created if missing)
+- **both** — concatenates synthetic + Kaggle-adapted rows
+
+Details: `data/external/kaggle/README.md`. Then run validate → features as usual (or `scripts/run_m2_pipeline.py`, which calls `prepare_dataset.py`).
+
 ### 1.2 Option A — easiest (recommended)
 
 ```powershell
@@ -54,7 +70,7 @@ python monitoring/check_drift.py
 ### 1.3 Option B — step by step
 
 ```powershell
-python data/generate_data.py
+python data/prepare_dataset.py --source synthetic
 python validation/validate_data.py
 python features/build_features.py
 python training/train.py
@@ -65,7 +81,7 @@ python monitoring/check_drift.py
 
 | Step | Entry file |
 |------|------------|
-| Generate data | `data/generate_data.py` |
+| Prepare data | `data/prepare_dataset.py` (`--source synthetic\|kaggle\|both`) |
 | Validate | `validation/validate_data.py` |
 | Features | `features/build_features.py` |
 | Train | `training/train.py` |
